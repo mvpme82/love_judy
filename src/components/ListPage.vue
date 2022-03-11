@@ -5,16 +5,12 @@
 
     </div>
     <div class="content">
-      <div class="left_content">
-        <div class="article_content">
-
-        </div>
-        <div class="comments">评论</div>
-      </div>
-      <div class="right_content">
-        <div class="latest_news">最新文章</div>
-        <div class="relative_news">相关文章</div>
-      </div>
+      <el-tabs v-model="curTabName" type="card" editable class="demo-tabs" @edit="handleTabsEdit"
+        @tab-click="handleTabClicked">
+        <el-tab-pane v-for="item in editableTabs" :key="item.name" :label="item.title" :name="item.name">
+          {{ item.content }}
+        </el-tab-pane>
+      </el-tabs>
     </div>
     <div class="footer">
       <Footer />
@@ -24,6 +20,11 @@
 
 <script>
   import Footer from './Footer.vue'
+  import Store from '../store'
+  import {
+    mapActions
+  } from 'vuex'
+
   export default {
     name: 'ListPage',
     props: {
@@ -31,6 +32,52 @@
     },
     components: {
       Footer
+    },
+    data() {
+      return {
+        editable: true,
+        curTabName: "1",
+        curTabNameIndex: "1",
+        tabIndex: 2,
+        editableTabs: Store.state.tabInfo
+      }
+    },
+    methods: {
+      handleTabsEdit() {
+        let new_tab_name = ++this.tabIndex;
+        let new_tab = {
+          title: '新建标签',
+          name: new_tab_name.toString()
+        };
+        this.addToTab(new_tab);
+        this.curTabName = this.tabIndex.toString();
+        this.curTabNameIndex = this.curTabName;
+        console.log("curTabName = ", this.curTabName);
+        console.log("tabIndex = ", this.tabIndex);
+      },
+      ...mapActions({
+        addToTab: 'addItemToTabs'
+      }),
+      handleTabClicked(tab, event) {
+        console.log(tab.props.name);
+        console.log('this.curTabName = ', this.curTabName);
+        console.log("tabIndex = ", this.tabIndex);
+        console.log(tab.props);
+        console.log(event);
+        if (this.curTabName === this.curTabNameIndex) {
+          console.log("同一个标签的点击，直接返回！");
+          return;
+        }
+        console.log("标签切换，原来的标签名：" + this.curTabNameIndex + ", 新的标签名：" + this.curTabName);
+        console.log("在这里做一些刷新逻辑！");
+        console.log("原标签名 " + this.curTabNameIndex + " 将被切换为 " + this.curTabName);
+        this.curTabNameIndex = this.curTabName;
+        console.log("切换后的当前标签名为 this.curTabNameIndex = " + this.curTabNameIndex + " this.curTabName = " + this
+          .curTabName);
+      }
+    },
+    computed: {
+
     }
   }
 </script>
